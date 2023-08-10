@@ -18,12 +18,10 @@ export const navigationSlice = createSlice({
   reducers: {
     pushRoute: (state, { payload }) => {
       const tabKey = payload.split("/")[1] || "search";
-
-      /* console.log("RUNNING PUSH");
-      console.log("payload", payload);
-      console.log("tabKey", tabKey); */
       // The user added a new route
-      state.routes.push(payload);
+      // Only push to routes if the last key is different
+      state.routes[state.routes.length - 1] != payload &&
+        state.routes.push(payload);
       // Only push to tab if the last key is different
       state[tabKey][state[tabKey].length - 1] != payload &&
         state[tabKey].push(payload);
@@ -39,11 +37,21 @@ export const navigationSlice = createSlice({
         (_, i) => i !== state[tabKey].length - 1
       );
     },
+    pushToTab: (state, { payload }) => {
+      state[payload.tabKey].push(payload.route);
+    },
+    popFromTab: (state, { payload }) => {
+      state[payload.tabKey] = state[payload.tabKey].filter(
+        (_, i) => i !== state[payload.tabKey].length - 1
+      );
+    },
   },
 });
 
 // This and the commented line below it work the same way
 export const pushRoute = navigationSlice.actions.pushRoute;
 export const popRoute = navigationSlice.actions.popRoute;
+export const pushToTab = navigationSlice.actions.pushToTab;
+export const popFromTab = navigationSlice.actions.popFromTab;
 
 // export const { pushRoute, popRoute } = postSlice.actions;

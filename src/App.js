@@ -15,7 +15,7 @@ import StaffPage from "./pages/StaffPage";
 import SchedulePage from "./pages/SchedulePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
-import { pushRoute, popRoute } from "./layouts/NavigationSlice";
+import { pushRoute, popRoute, popFromTab } from "./layouts/NavigationSlice";
 import "./App.css";
 
 const useBackListener = ({ onPush, onPop }) => {
@@ -54,7 +54,23 @@ function App() {
   const onPop = (payload) => {
     console.log("onPop", payload);
     dispatch(popRoute(payload.location.pathname));
-    navigate("/");
+    const navigationTMP = navigation;
+    debugger;
+
+    const tabKey = payload.location.pathname.split("/")[1] || "search";
+    console.log("tabKey", tabKey);
+    // Get the route which we should go back to.
+    // Then pop from the tab stack
+    const routeToGoBackTo = navigation[tabKey][navigation[tabKey].length - 1];
+    console.log("routeToGoBackTo", routeToGoBackTo);
+    if (routeToGoBackTo) {
+      navigate(routeToGoBackTo, { replace: true });
+      dispatch(popFromTab({ tabKey }));
+    } else {
+      // No route to go back to, this means we clear our entire stack
+      // And go back to home
+      navigate("/", { replace: true });
+    }
   };
 
   useBackListener({ onPush, onPop });
