@@ -17,6 +17,7 @@ const NavigationLayout = () => {
   // Is inside a nested route
 
   const tabKey = location.pathname.split("/")[1] || "search";
+  const activeTab = location.pathname.split("/")[1] || "search";
 
   const goBack = useCallback(() => {
     const routeToGoBackTo = navigation[tabKey][navigation[tabKey].length - 2];
@@ -32,9 +33,6 @@ const NavigationLayout = () => {
   }, [location]);
 
   const shouldShowBackButton = navigation[tabKey]?.length > 1;
-  console.log("tabKey", tabKey);
-  console.log("routes[tabKey]", navigation[tabKey]);
-  console.log("shouldShowBackButton", shouldShowBackButton);
 
   return (
     <div className="navigationContainer">
@@ -56,7 +54,15 @@ const NavigationLayout = () => {
         <nav>
           <ul>
             <li>
-              <Link to={navigation.search[navigation.search.length - 1] || "/"}>
+              <Link
+                to={
+                  // If searchTab is active, and it contains more than one route
+                  // The link should send us back to the home page
+                  navigation.search.length > 1 && activeTab === "search"
+                    ? "/"
+                    : navigation.search[navigation.search.length - 1] || "/"
+                }
+              >
                 Search
               </Link>
             </li>
