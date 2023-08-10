@@ -2,9 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   // Routes contains all of URLs visited regardless of tab
-  routes: [],
+  routes: ["/"],
   // Our tabs here: To keep track of the navigation for each individual tab
-  search: [],
+  search: ["/"],
   todo: [],
   feed: [],
   staff: [],

@@ -24,8 +24,6 @@ const useBackListener = ({ onPush, onPop }) => {
   useEffect(() => {
     if (!onPush || !onPop) return;
     const listener = ({ location, action }) => {
-      console.log("action", location);
-      console.log("location", location);
       if (action === "PUSH") {
         onPush({ location, action });
       } else if (action === "POP") {
@@ -48,21 +46,14 @@ function App() {
   console.log("navigation", navigation);
 
   const onPush = (payload) => {
-    console.log("onPush", payload);
     dispatch(pushRoute(payload.location.pathname));
   };
   const onPop = (payload) => {
-    console.log("onPop", payload);
     dispatch(popRoute(payload.location.pathname));
-    const navigationTMP = navigation;
-    debugger;
-
     const tabKey = payload.location.pathname.split("/")[1] || "search";
-    console.log("tabKey", tabKey);
     // Get the route which we should go back to.
     // Then pop from the tab stack
     const routeToGoBackTo = navigation[tabKey][navigation[tabKey].length - 1];
-    console.log("routeToGoBackTo", routeToGoBackTo);
     if (routeToGoBackTo) {
       navigate(routeToGoBackTo, { replace: true });
       dispatch(popFromTab({ tabKey }));
