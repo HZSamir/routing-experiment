@@ -19,12 +19,14 @@ export const navigationSlice = createSlice({
     pushRoute: (state, { payload }) => {
       const tabKey = payload.split("/")[1] || "search";
 
-      console.log("RUNNING PUSH");
+      /* console.log("RUNNING PUSH");
       console.log("payload", payload);
-      console.log("tabKey", tabKey);
+      console.log("tabKey", tabKey); */
       // The user added a new route
       state.routes.push(payload);
-      state[tabKey].push(payload);
+      // Only push to tab if the last key is different
+      state[tabKey][state[tabKey].length - 1] != payload &&
+        state[tabKey].push(payload);
     },
     popRoute: (state, { payload }) => {
       const tabKey = payload.split("/")[1] || "search";

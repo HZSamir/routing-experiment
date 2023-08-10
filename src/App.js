@@ -24,7 +24,8 @@ const useBackListener = ({ onPush, onPop }) => {
   useEffect(() => {
     if (!onPush || !onPop) return;
     const listener = ({ location, action }) => {
-      console.log("listener", { location, action });
+      console.log("action", location);
+      console.log("location", location);
       if (action === "PUSH") {
         onPush({ location, action });
       } else if (action === "POP") {
@@ -38,6 +39,7 @@ const useBackListener = ({ onPush, onPop }) => {
 };
 
 function App() {
+  const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
@@ -45,13 +47,14 @@ function App() {
 
   console.log("navigation", navigation);
 
-  const onPush = (location) => {
-    console.log("onPush", { location });
-    dispatch(pushRoute(location.location.pathname));
+  const onPush = (payload) => {
+    console.log("onPush", payload);
+    dispatch(pushRoute(payload.location.pathname));
   };
-  const onPop = (location) => {
-    console.log("onPop", { location });
-    dispatch(popRoute(location.location.pathname));
+  const onPop = (payload) => {
+    console.log("onPop", payload);
+    dispatch(popRoute(payload.location.pathname));
+    navigate("/");
   };
 
   useBackListener({ onPush, onPop });
