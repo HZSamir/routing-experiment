@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Routes,
@@ -7,6 +7,7 @@ import {
   UNSAFE_NavigationContext,
   useNavigate,
 } from "react-router-dom";
+import { last } from "lodash";
 import NavigationLayout from "./layouts/NavigationLayout";
 import SearchPage from "./pages/SearchPage";
 import TodoPage from "./pages/TodoPage";
@@ -15,7 +16,7 @@ import StaffPage from "./pages/StaffPage";
 import SchedulePage from "./pages/SchedulePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
-import { pushRoute, popRoute, popFromTab } from "./layouts/NavigationSlice";
+import { pushRoute, popRoute, popFromRoutes } from "./layouts/NavigationSlice";
 import "./App.css";
 
 const useBackListener = ({ onPush, onPop }) => {
@@ -40,31 +41,89 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const disableListener = useRef(false);
 
   const navigation = useSelector((state) => state.navigationStoreReducer);
 
-  console.log("navigation", navigation);
-
   const onPush = (payload) => {
-    dispatch(pushRoute(payload.location.pathname));
-  };
-  const onPop = (payload) => {
-    dispatch(popRoute(payload.location.pathname));
-    const tabKey = payload.location.pathname.split("/")[1] || "search";
-    // Get the route which we should go back to.
-    // Then pop from the tab stack
-    const routeToGoBackTo = navigation[tabKey][navigation[tabKey].length - 1];
-    if (routeToGoBackTo) {
-      navigate(routeToGoBackTo, { replace: true });
-      dispatch(popFromTab({ tabKey }));
+    if (!disableListener.current) {
+      dispatch(pushRoute(payload.location.pathname));
     } else {
-      // No route to go back to, this means we clear our entire stack
-      // And go back to home
-      navigate("/", { replace: true });
+      console.log("tried to push but listener was disabled");
     }
   };
 
+  const onPop = (payload) => {
+    console.log("do Nothing");
+  };
+
   useBackListener({ onPush, onPop });
+
+  console.log("navigation", navigation);
+
+  const handlePushState = (e) => {
+    console.log("pushing");
+  };
+
+  const handlePopState = (e) => {
+    e.preventDefault();
+
+    if (navigation.routes.length <= 1) return;
+
+    let activeTab;
+    //  navigation.routes[navigation.routes.length - 1].split("/")[1] || "search";
+    const currentTab =
+      navigation.routes[navigation.routes.length - 1].split("/")[1] || "search";
+    if (last(navigation.routes) != currentTab) activeTab = currentTab;
+    else
+      activeTab =
+        navigation.routes[navigation.routes.length - 2].split("/")[1] ||
+        "search";
+
+    // If the current route contains a parent
+    // Go back to that first
+    // const toGoTo = navigation[activeTab].length > 1 ? navigation[activeTab][navigation[activeTab].length - 2] : navigation.routes[navigation.routes.length - 2]
+
+    let toGoTo;
+    // Go back up in the tab
+    // console.log("e", e);
+    // console.log("navigation", navigation);
+    // console.log("activeTab", activeTab);
+    // console.log("length", navigation[activeTab].length);
+
+    if (navigation[activeTab].length > 1) {
+      console.log("Pop from tab");
+      toGoTo = navigation[activeTab][navigation[activeTab].length - 2];
+
+      disableListener.current = true;
+      navigate(toGoTo);
+      dispatch(popFromRoutes());
+      disableListener.current = false;
+
+      // Remove it from both tab reducer and routes reducer
+    } else {
+      // Go to previous tab
+      console.log("Pop from routes");
+      toGoTo = navigation.routes[navigation.routes.length - 2];
+
+      disableListener.current = true;
+      console.log("toGoTo", toGoTo);
+      navigate(toGoTo);
+      dispatch(popRoute(activeTab));
+      disableListener.current = false;
+
+      // Remove it from routes reducer
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("onpushstate", handlePushState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [navigation]);
 
   return (
     <div className="appContainer">

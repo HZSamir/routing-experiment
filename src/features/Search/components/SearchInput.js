@@ -31,7 +31,6 @@ export const SearchInput = ({ value, onChange }) => {
       searchObject.clients.length === 0 &&
       searchObject.searchQuery
     ) {
-      console.log("searchObject", searchObject);
       return (
         <div className="capitalize">
           No user by the name of: {searchObject.searchQuery} was found!
@@ -39,8 +38,6 @@ export const SearchInput = ({ value, onChange }) => {
       );
     }
   };
-
-  console.log(searchObject.clients);
 
   return (
     <div>

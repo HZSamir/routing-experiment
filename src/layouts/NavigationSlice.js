@@ -45,6 +45,17 @@ export const navigationSlice = createSlice({
         (_, i) => i !== state[payload.tabKey].length - 1
       );
     },
+
+    popFromRoutes: (state) => {
+      state.routes = state.routes.filter(
+        (_, i) => i !== state.routes.length - 1
+      );
+    },
+    removeFromTab: (state) => {
+      state.routes = state.routes.filter(
+        (_, i) => i !== state.routes.length - 1
+      );
+    },
   },
 });
 
@@ -53,5 +64,6 @@ export const pushRoute = navigationSlice.actions.pushRoute;
 export const popRoute = navigationSlice.actions.popRoute;
 export const pushToTab = navigationSlice.actions.pushToTab;
 export const popFromTab = navigationSlice.actions.popFromTab;
+export const popFromRoutes = navigationSlice.actions.popFromRoutes;
 
 // export const { pushRoute, popRoute } = postSlice.actions;
